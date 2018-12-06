@@ -1,0 +1,25 @@
+{% extends "frontend/page.html" %}
+
+{% block content %}
+
+
+	<div class="entry-content">
+		{{ page.content|safe }}	
+	</div>
+
+    <ul id="faqs">
+        {% for faq in faqs %}
+			<li class="faq">
+				<h3 class="faq-question"><a href="#faq_{{ faq.pk }}">{{ faq.title }}</a></h3>
+				<div class="faq-answer">
+					{{ faq.content|safe }}
+				</div>
+			</li>				
+        {% endfor %}
+    </ul>
+	
+    {% for faq in faqs %}
+		
+    {% endfor %}
+	
+{% endblock %}

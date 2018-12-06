@@ -1,0 +1,67 @@
+{% extends "site_base.html" %}
+{% load i18n thumbnail article_tags %}
+
+{% block section_title %}
+	<h1>National Resources</h1>
+{% endblock %}
+
+{% block body_class %}resources{% endblock %}
+
+{% block body %}
+
+	<div>
+	
+		<div class="col col-640 margr2">
+		
+			<header id="title">
+				<h1>{{ page.title }}</h1>
+			</header>
+			
+			<div class="padt">
+			
+				{% articles_with_tags region|default:redmap_tag page as resources %}
+			
+				{% for article in resources %}
+				<article class="box pada margb2">
+					<div class="media overflow">
+						<a class="pull-left" href="{{ article.get_public_url }}">
+							{% if article.image %}
+								{% thumbnail article.image "100x100" crop="center" as im %}
+									<img src="{{ MEDIA_URL }}{{ im }}">
+								{% endthumbnail %}
+							{% else %}
+								<img src="{{ STATIC_URL }}reskin/images/placeholder.png" style="height:75px;">
+							{% endif %}
+						</a>
+						<div class="media-body">
+							<h3 class="media-heading"><a href="{{ article.get_public_url }}">{{ article.title }}</a></h3>
+							{% if article.excerpt %}
+								{{ article.excerpt|safe }}
+							{% else %}
+								{{ article.excerpt|safe|truncatewords_html:70 }}
+							{% endif %}
+						</div>
+					</div>
+					<span class="paperclip-left"></span>
+				</article>
+				{% empty %}
+					<p><i>There are currently no pages in this section</i></p>
+				{% endfor %}
+				
+				
+			</div>
+			
+		</div>
+		
+		<div class="col col-260 margl2 padt2 sidebar-up" id="sidebar">
+			<div class="box pada2">
+			
+				{% include 'nav/page_list.html' %}
+				
+				<span class="paperclip-right-angle"></span>
+			</div>
+		</div>
+		
+	</div>
+
+{% endblock %}

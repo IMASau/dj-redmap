@@ -1,0 +1,45 @@
+{% extends "site_base.html" %}
+
+{% load bootstrap_tags i18n thumbnail %}
+
+{% block head_title %}{% trans "Profile" %}{% endblock %}
+
+{% block section_title %}<h1>User Profile</h1>{% endblock %}
+
+{% block body %}
+
+<div class="overflow">
+
+	<div class="col col-200 margr2 margb2 padb2">
+		
+		<div class="margb overflow">
+			{% include "snippet/profile-thumbnail.html" with profile=user.profile geometry="180x135" %}
+		</div>
+		
+		<div class="margb2">
+			<h3 class="nomargb"><strong>{{ user.profile }}</strong></h3>
+			{% if user.profile.organisation %}<h4>{{ user.profile.organisation }}</h4>{% endif %}
+			{% if user.profile.about_me %}
+				<div class="padt">
+					{{ user.profile.about_me|linebreaks|safe }}
+				</div>
+			{% endif %}
+		</div>
+		
+		<ul class="lines">
+			<li><i class="icon-calendar"></i> <strong>Joined</strong>: {{ user.date_joined|date:"j F, Y" }}</li>
+			<li><i class="icon-tags"></i> <strong>Total sightings</strong>: {{ sightings.count }}</li>
+			<li><i class="icon-tags"></i> <strong>Validated photo sightings</strong>: {{ photo_sightings.count }}</li>
+		</ul>
+
+	</div>
+	<div class="col col-700 margl2 margb2 padb2">
+	
+		<div class="overflow">
+			<h2 class="float-left">Validated sightings</h2>
+		</div>
+		{% include "accounts/view_profile_sightings_list.html" %}
+		</ul>
+	</div>
+</div>
+{% endblock %}

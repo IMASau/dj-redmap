@@ -1,0 +1,54 @@
+{% extends 'zinnia/entry_detail.html' %}
+
+{% load thumbnail %}
+
+{% block content_body %}
+	<div class="col col-620 margl2">
+	{{ object.content|safe }}
+{% endblock %}
+
+{% block content_gallery_below %}
+	{% if object.gallery.count %}
+	<div class="clear"></div>
+	<div class="box overflow thumbnails">
+		
+			{% if object.image %}
+				<div class="col col-210">
+					<div class="thumbnail">
+					
+						{% thumbnail object.image '200x200' as im %}
+							<p><a class="lightbox-image" title="{{ object.caption }}" href="{{ object.image.url }}"><img src="{{ im.url }}"></a></p>
+						{% endthumbnail %}
+	
+						<p><cite>{{ image.caption }}</cite></p>
+					</div>
+				</div>
+			{% endif %}
+		
+			{% for image in object.gallery.all %}
+			<div class="col col-210">
+				<div class="thumbnail">
+				
+					{% thumbnail image.image '200x200' as im %}
+						<p><a class="lightbox-image" title="{{ image.caption }}" href="{{ image.image.url }}"><img src="{{ im.url }}"></a></p>
+					{% endthumbnail %}
+
+					<p><cite>{{ image.caption }}</cite></p>
+				</div>
+			</div>
+
+			{% if object.image %}
+				{% if forloop.counter == 2 or forloop.counter|add:"1"|divisibleby:3 %}
+					<div class="clear"></div>
+				{% endif %}
+			{% else %}
+				{% if forloop.counter|divisibleby:3 %}
+					<div class="clear"></div>
+				{% endif %}
+			{% endif %}
+			
+			{% endfor %}
+
+	</div><!-- /.box -->
+	{% endif %}
+{% endblock %}

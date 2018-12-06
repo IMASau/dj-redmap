@@ -1,0 +1,344 @@
+'''
+Created on 21/08/2012
+
+@author: thomas
+'''
+
+from django.db import connection, connections
+from django.test import TestCase
+from django.test.testcases import SimpleTestCase
+from redmap.apps.redmapdb.models import Sex
+from redmap.apps.redmapdb.managers import RedmapManager
+
+class SexTest(TestCase):
+
+    def tearDown(self):
+        sql_clear = """DROP PROCEDURE [dbo].[RM_SEX_MAINT];"""
+        cursor = connection.cursor()
+        cursor.execute(sql_clear)
+        cursor.close()
+        sql_clear = """DROP PROCEDURE [dbo].[RM_SEX_SEL];"""
+        cursor = connection.cursor()
+        cursor.execute(sql_clear)
+        cursor.close()
+
+    def setUp(self):
+
+        self.sex1 = Sex(code='U', description='Unknown', update_number=0)
+        self.sex2 = Sex(code='M', description='Male', update_number=1)
+
+        sql_for_maint = \
+"""CREATE PROCEDURE [dbo].[RM_SEX_MAINT]
+    @pMode int = 1, -- OUTPUT -- Remove comment for validation mode 4!
+    @pID int = NULL OUTPUT,
+    @pCODE varchar(3) = NULL,
+    @pDESCRIPTION varchar(50) = NULL,
+    @pUPDATE_NUMBER int = NULL,
+    @pERROR varchar(255) = '' OUTPUT
+AS
+SET NOCOUNT ON
+----------------------------------------------------------------------
+-- HISTORY
+----------
+-- 23/08/2012     Created by PHW
+----------------------------------------------------------------------
+-- Procedure to maintain data in the RM_SEX table
+--
+-- PARAMETERS
+-------------
+-- @pMode   Procedure Mode (See below)
+-- @pID     Value for the ID field
+-- @pCODE   Value for the CODE field
+-- @pDESCRIPTION  Value for the DESCRIPTION field
+-- @pUPDATE_NUMBER      Value for the UPDATE_NUMBER field
+--
+-- pMode
+-------------
+-- 1 = Insert record (New ID is returned in @pID)
+-- 2 = Update record
+-- 3 = Delete record (Only requires @pID parameter)
+----------------------------------------------------------------------
+BEGIN
+DECLARE @RowCount INT
+ 
+--IF @pMode = 1 OR @pMode = 2
+--BEGIN
+      -- Business Rules for INSERT or UPDATE
+      -- eg.
+      --IF @pAnything > 5
+      --BEGIN
+            --SET @pError = 'Anthing must be less than 5'
+            --RETURN -3 -- Code for broken business rule
+      --END
+--END
+ 
+SET @pERROR = ''
+ 
+IF @pMode = 1
+BEGIN
+ 
+      -- Insert a new record
+      INSERT INTO RM_SEX
+      (CODE, DESCRIPTION, UPDATE_NUMBER)
+      VALUES
+      (@pCODE, @pDESCRIPTION, 0)
+ 
+      IF @@ERROR <> 0 OR @@ROWCOUNT <> 1
+            BEGIN
+                  SELECT -1 AS RETURN_CODE, @pERROR AS RETURN_STRING, @pID AS ID
+                  RETURN -1
+            END
+ 
+      -- Return the new ID
+      SET @pID = SCOPE_IDENTITY()
+ 
+      IF @@ERROR <> 0
+            BEGIN
+                  SELECT -1 AS RETURN_CODE, @pERROR AS RETURN_STRING, @pID AS ID
+                  RETURN -1
+            END
+      ELSE
+            BEGIN
+                  SELECT 0 AS RETURN_CODE, @pERROR AS RETURN_STRING, @pID AS ID
+                  RETURN 0
+            END
+ 
+END
+ 
+IF @pMode = 2
+BEGIN
+      -- Update the record
+      UPDATE RM_SEX SET
+            CODE = @pCODE,
+            DESCRIPTION = @pDESCRIPTION,
+            UPDATE_NUMBER = @pUPDATE_NUMBER + 1
+      WHERE ID = @pID AND UPDATE_NUMBER = @pUPDATE_NUMBER
+ 
+      -- Check for user data conflicts
+      SET @RowCount = @@ROWCOUNT
+      IF @RowCount = 0
+            BEGIN
+                  SELECT -2 AS RETURN_CODE, @pERROR AS RETURN_STRING, @pID AS ID
+                  RETURN -2
+            END
+ 
+      IF @@ERROR <> 0 OR @RowCount <> 1
+            BEGIN
+                  SELECT -1 AS RETURN_CODE, @pERROR AS RETURN_STRING, @pID AS ID
+                  RETURN -1
+            END
+      ELSE
+            BEGIN
+                  SELECT 0 AS RETURN_CODE, @pERROR AS RETURN_STRING, @pID AS ID
+                  RETURN 0
+            END
+END
+ 
+IF @pMode = 3
+BEGIN
+      -- Delete the record
+      DELETE FROM RM_SEX
+      WHERE ID = @pID
+ 
+      IF @@ERROR <> 0 OR @@ROWCOUNT <> 1
+            BEGIN
+                  SELECT -1 AS RETURN_CODE, @pERROR AS RETURN_STRING, @pID AS ID
+                  RETURN -1
+            END
+      ELSE
+            BEGIN
+                  SELECT 0 AS RETURN_CODE, @pERROR AS RETURN_STRING, @pID AS ID
+                  RETURN 0
+            END
+END
+ 
+-- If we've come this far, the mode must be wrong
+SELECT -1 AS RETURN_CODE, @pERROR AS RETURN_STRING, @pID AS ID
+RETURN -1
+END
+"""
+        cursor = connection.cursor()
+        cursor.execute(sql_for_maint)
+        cursor.close()
+
+        sql_for_sel = \
+"""CREATE PROCEDURE [dbo].[RM_SEX_SEL]
+    @pMODE int = 1,
+    @pID int = NULL
+AS
+SET NOCOUNT ON
+----------------------------------------------------------------------
+-- HISTORY
+----------
+-- 23/08/2012    Created by PHW
+----------------------------------------------------------------------
+-- Procedure to return data from the RM_SEX table
+--
+-- PARAMETERS
+-------------
+-- @pMode    Procedure Mode (See below)
+-- @pID    ID of the record (Mode 2)
+--
+-- pMODE
+-------------
+-- 1 = Select all records
+-- 2 = Select record with requested ID
+-- 3 = Select records for grid display list
+-- 4 = Select records for gdropdown combo list
+----------------------------------------------------------------------
+BEGIN
+
+IF @pMode = 1
+BEGIN
+    -- Select all records
+    SELECT * FROM RM_SEX
+
+    IF @@ERROR <> 0
+        RETURN -1
+    ELSE
+        RETURN 0
+
+END
+
+IF @pMode = 2
+BEGIN
+    -- Select requested record
+    SELECT * FROM RM_SEX
+    WHERE ID = @pID
+
+    IF @@ERROR <> 0 OR @@ROWCOUNT <> 1
+        RETURN -1
+    ELSE
+        RETURN 0
+END
+
+IF @pMode = 3
+BEGIN
+    -- Select grid display list
+    SELECT
+        RM_SEX.ID AS [Id],
+        RM_SEX.CODE AS [Code],
+        RM_SEX.DESCRIPTION AS [Description],
+        RM_SEX.UPDATE_NUMBER AS [Update Number]
+    FROM RM_SEX
+
+    IF @@ERROR <> 0
+        RETURN -1
+    ELSE
+        RETURN 0
+END
+
+IF @pMode = 4
+BEGIN
+    -- Select dropdown combo list
+    SELECT
+        RM_SEX.ID AS [Id],
+        RM_SEX.CODE AS [Code],
+        RM_SEX.DESCRIPTION AS [Description],
+        RM_SEX.UPDATE_NUMBER AS [Update Number]
+    FROM RM_SEX
+
+    IF @@ERROR <> 0
+        RETURN -1
+    ELSE
+        RETURN 0
+END
+
+-- If we've come this far, the mode must be wrong
+RETURN -1
+
+END"""
+
+        cursor = connection.cursor()
+        cursor.execute(sql_for_sel)
+        cursor.close()
+
+    def test_can_run_stored_procedure(self):
+        from django.db import models, connection
+
+        #CREATE
+        sp_name = '[dbo].[RM_SEX_MAINT]'
+        cursor = connection.cursor()
+        call = "{call " + sp_name + "(1,,'NEW','A new description','5')}"
+        cursor.execute(call)
+        cursor.close()
+
+        #CREATE WITH NAMED PARAMETERS
+        sp_name = '[dbo].[RM_SEX_MAINT]'
+        cursor = connection.cursor()
+        call = "exec " + sp_name + " @pMode = 1, @pCODE = 'OLD', @pDESCRIPTION = 'An old description', @pUPDATE_NUMBER = 200;"
+        cursor.execute(call)
+        cursor.close()
+
+        #CREATE WITH NAMED PARAMETERS FROM ARRAY
+        sp_name = '[dbo].[RM_SEX_MAINT]'
+        cursor = connection.cursor()
+        call = "exec " + sp_name + " @pMode = %s, @pCODE = %s, @pDESCRIPTION = %s, @pUPDATE_NUMBER = %s;"
+        vals = [1, 'M', 'A Male ', 250]
+        cursor.execute(call, vals)
+        cursor.close()
+
+        #SELECT
+        sp_name = '[dbo].[RM_SEX_SEL]'
+        cursor = connection.cursor()
+        call = "{call " + sp_name + "(1)}"
+        cursor.execute(call)
+        results = cursor.fetchall()
+        cursor.close()
+
+    def test_sp(self):
+        """Can save sex"""
+        self.sex1.save()
+        self.sex2.save()
+
+    def test_prepare_sp_parameters(self):
+
+        sex = Sex(code='U', description='Unknown', update_number=0)
+
+        correct = {'pID': None,
+                   'pCODE': sex.code,
+                   'pDESCRIPTION': sex.description,
+                   'pUPDATE_NUMBER': sex.update_number,
+                   }
+
+        gened = sex._get_sp_parameters()
+
+        self.assertEqual(gened, correct, 'prepare params failed')
+
+    def test_prepare_sp_call(self):
+        import collections
+
+        sex = Sex(code='U', description='Unknown', update_number=0)
+
+        params = sex._get_sp_parameters()
+        params = collections.OrderedDict(sorted(params.iteritems()))
+
+        valid_call = "exec RM_SEX_MAINT @pCODE = %s, @pDESCRIPTION = %s, @pID = %s, @pUPDATE_NUMBER = %s, @pMODE = %s;"
+
+        model_call, model_vals = sex._get_sp_call(sex.modify_sp, 1, params)
+
+        self.assertEqual(valid_call, model_call, 'stored procedure call parameters do not match')
+
+    def test_execute_sp_and_get_scope(self):
+
+        sex = Sex(code='U', description='Unknown', update_number=0)
+
+        results = sex.run_stored_procedure(4)
+
+        print results
+
+
+class SightingManagerTest(SimpleTestCase):
+    """These tests attack the development MSSQL database, as such the database
+     setup and tear down is removed"""
+
+    def setUp(self):
+        self.manager = RedmapManager()
+
+    def test_function_species_in_range(self):
+
+        true_args = [277, -41, 140]
+        false_args = [277, -41, 20]
+
+        self.assertTrue(self.manager.function_species_in_range(*true_args), 'Species wasn\'t found inside the range it should be')
+        self.assertFalse(self.manager.function_species_in_range(*false_args), 'Species wasn\'t found outside the range it should be')

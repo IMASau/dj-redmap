@@ -1,0 +1,62 @@
+{% extends "site_base.html" %}
+
+{% load i18n comments zinnia_tags thumbnail %}
+{% load url from future %}
+
+{% block body_class %}news{% endblock %}
+
+{% block head_title %}Latest News{% endblock %}
+
+{% block meta_description %}{% trans "Latest entries for" %} {% if category %}{% trans "the category" %} {{ category }}{% if category.description %}: {{ category.description|striptags|safe }}{% endif %}{% endif %}{% if tag %}{% trans "the tag" %} {{ tag }}{% endif %}{% if author %}{% trans "the author" %} {{ author }}{% endif %}{% if page_obj %}{% ifnotequal page_obj.number 1 %} {% trans "page" %} {{ page_obj.number }}{% endifnotequal %}{% endif %}{% endblock %}
+
+{% block section_title %}<h1>{% if region %}{{ region.owner }}{% else %}National{% endif %} News</h1>{% endblock %}
+
+{% block body %}
+
+
+		<div class="col col-640 margr2">
+		
+			<div class="padt">
+			
+				{% for object in object_list %}
+				<article class="box pada margb2">
+					<div class="media overflow">
+						<a class="pull-left" href="{{ object.get_absolute_url }}">
+							{% if object.image %}
+								{% thumbnail object.image "100x100" crop="center" as im %}
+									<img src="{{ MEDIA_URL }}{{ im }}">
+								{% endthumbnail %}
+							{% else %}
+								<img src="{{ STATIC_URL }}reskin/images/placeholder.png" style="height:100px;">
+							{% endif %}
+						</a>
+						<div class="media-body">
+							<h3 class="media-heading"><a href="{{ object.get_absolute_url }}">{{ object.title }}</a></h3>
+							{% if object.excerpt %}
+								{{ object.excerpt|safe|truncatewords_html:70 }}
+							{% else %}
+								{{ object.content|safe|truncatewords_html:70 }}
+							{% endif %}
+						</div>
+					</div>
+					<span class="paperclip-left"></span>
+				</article>
+				{% empty %}
+					<p><i>There are currently no pages in this section</i></p>
+				{% endfor %}
+				
+					
+				{% include "backend/_pagination.html" %}
+					
+				
+			</div>
+			
+		</div>
+
+	
+	<aside class="col col-260 margl2" id="sidebar">
+		{% include "zinnia/_sidebar.html" with latest_news=object_list %}
+	</aside><!-- /.col -->
+
+{% endblock %}
+

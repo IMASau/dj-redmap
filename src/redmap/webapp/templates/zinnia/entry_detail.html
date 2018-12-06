@@ -1,0 +1,99 @@
+{% extends "site_base.html" %}
+
+{% load i18n thumbnail %}
+
+{% block head_title %}{{ object.title }}{% endblock %}
+
+{% block meta-description %}{% if object.excerpt %}{{ object.excerpt|striptags }}{% else %}{{ object.content|striptags|truncatewords:100 }}{% endif %}{% endblock %}
+
+{% block body_class %}news{% if is_draft %} draft-content{% endif %}{% endblock %}
+
+{% block section_title %}<h1>Latest News</h1>{% endblock %}
+
+{% block body %}
+
+		<article class="col col-640 margr2">
+		
+			<header id="title" style="overflow: visible">
+				{% block content_title %}<h1>{% if is_draft %}<em>{{ object.title }} - (Draft)</em>{% else %}{{ object.title }}{% endif %}</h1>{% endblock %}
+
+				<div>
+					<div class="col col-right col-100">
+						<div class="social">
+							<div class="social-fb">
+								<div
+									class="fb-like"
+									data-href="{{ full_absolute_uri }}"
+									data-send="false"
+									data-layout="button_count"
+									data-width="100"
+									data-action="like"
+									data-font="arial"
+									data-show-faces="false"
+								></div>
+							</div>
+							<div class="social-twitter">
+								<a href="https://twitter.com/share" class="twitter-share-button">Tweet</a>
+								<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+							</div>
+						</div><!-- /.social -->
+					</div>
+					<div class="margr-120 entry-excerpt padt">
+						{% if object.author %}<p class="blue">{{ object.author }}{% if object.author.location %}, {{ object.author.location }}{% endif %}{% if object.start_publication and not is_resource_page %}, {{ object.start_publication|date:"d b Y"|title }}{% endif %}.</p>{% endif %}
+						{% if object.excerpt %}{{ object.excerpt|safe }}{% endif %}
+					</div>
+				</div>
+				
+				<div class="clearfix"></div>
+			</header>
+			
+			{% block content_body %}
+			{% if object.image %}
+				<div class="box col col-220">
+					<div class="thumbnail">
+						<p>
+							<a class="lightbox-image" title="{% if object.except %}{{ object.excerpt }}{% endif %}" href="{% thumbnail object.image '640x480' as im %}{{ im.url }}{% endthumbnail %}">
+								
+								{% thumbnail object.image '200x200' crop="center" as im %}
+									<img src="{{ im.url }}">
+								{% endthumbnail %}
+								
+							</a>
+						</p>
+						{% if object.image_caption %}<p><cite>{{ object.image_caption }}</cite></p>{% endif %}
+					</div>
+					<span class="paperclip-left"></span>
+				</div>
+				<div class="col col-400 margl2">
+			{% else %}
+				<div class="col col-620 margl2">
+			{% endif %}
+				{{ object.content|safe }}
+			{% endblock %}
+			
+			<div class="clearfix"></div>
+			
+			{% block content_related %}
+				{% include "search/related_links.html" with object=object %}
+			{% endblock %}
+
+			{% comment %}
+				<div class="entry-content">
+					{% if object.author %}<h2>By {{ object.author }}</h2>{% endif %}
+					{% include "snippet/html-content.html" with html=object.html_content %}
+				</div>
+			{% endcomment %}
+
+			</div>
+
+			{% block content_gallery_below %}{% endblock %}
+
+		</article>
+	
+		{% block content_aside %}
+		<aside class="col col-260 margl2" id="sidebar">
+			{% include "zinnia/_sidebar.html" with latest_news=latest_news %}
+		</aside><!-- /.col -->
+		{% endblock %}
+
+{% endblock %}

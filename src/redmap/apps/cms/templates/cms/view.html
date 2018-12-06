@@ -1,0 +1,35 @@
+{% extends "site_base.html" %}
+
+{% block section_title %}	
+	{% if ancestors.1 %}		
+		{% with parent=ancestors.1 %}
+			<h1>{{ parent.title }}</h1>
+		{% endwith %}
+	{% endif %}
+{% endblock %}
+
+{% block breadcrumbs %}
+	{# {% include "cms/_breadcrumbs.html" %} #}
+{% endblock %}
+
+{% block body %}
+	<article class="col col-640 margr2">
+		<header id="title">
+			<h1>{{ page.title }}</h1>
+		</header>		
+		{{ page.content|safe }}
+	</article>
+	
+	<aside id="sidebar" class="col col-260 margl2">
+		<div class="box pada2">
+			<ul class="lines">
+			{% for descendant in descendants %}
+				{% if descendant.get_level == level %}
+					<li><a href="{{ descendant.get_public_url }}">{{ descendant.title }}</a></li>
+				{% endif %}
+			{% endfor %}
+			</ul>
+		</div>
+		<span class="paperclip-right-vertical"></span>
+	</aside>
+{% endblock %}

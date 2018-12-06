@@ -1,0 +1,47 @@
+{% extends "frontend/page.html" %}
+
+{% load thumbnail %}
+
+{% block content %}
+
+
+	<div class="entry-content">
+		{{ page.content|safe }}	
+	</div>
+
+	{% with regional_sponsors=region.sponsor_set.get_major_minor %}
+		{% with shape=shape|default:"194x154" %}
+			
+			<h2 class="padt2">Our major sponsors in {{ region }}</h2>		
+		
+			<ul class="listing clear3 padt">
+				{% for sponsor in regional_sponsors.major %}
+					<li class="col col-200 col margb2 margl2">
+						<div class="polaroid-small center" style="width: 200px; height: 160px; display: table-cell; vertical-align: middle;">
+							{% thumbnail sponsor.image_url shape as im %}
+								<img alt="{{ sponsor }}" title="{{ sponsor }}" src="{{ im.url }}">
+							{% endthumbnail %}
+						</div>
+						<h4 class="center padt">{{ sponsor }}</p>
+					</li>
+				{% endfor %}
+			</ul>
+			
+			<h2 class="padt2">Our supporting sponsors in {{ region }}</h2>		
+		
+			<ul class="listing clear3 padt">
+				{% for sponsor in regional_sponsors.minor %}
+					<li class="col col-200 col margb2 margl2">
+						<div class="polaroid-small center" style="width: 200px; height: 160px; display: table-cell; vertical-align: middle;">
+							{% thumbnail sponsor.image_url shape as im %}
+								<img alt="{{ sponsor }}" title="{{ sponsor }}" src="{{ im.url }}">
+							{% endthumbnail %}
+						</div>
+						<h4 class="center padt">{{ sponsor }}</p>
+					</li>
+				{% endfor %}
+			</ul>
+		{% endwith %}		
+	{% endwith %}
+
+{% endblock %}

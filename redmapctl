@@ -1,0 +1,63 @@
+#!/bin/bash
+# a somewhat naive control script for managing redmap
+
+USAGE="redmapctl {start,stop,restart,status}"
+
+REDMAP_SERVER_PID="$HOME/deploy/tmp/redmap_server.pid"
+REDMAP_SERVER_LOG="$HOME/deploy/tmp/redmap_server.log"
+REDMAP_SERVER_SETTINGS="-b 127.0.0.1:9100 -D -w 2 --max-requests=500 -p $REDMAP_SERVER_PID --error-logfile=$REDMAP_SERVER_LOG"
+
+function redmap-server-status() {
+    if [[ -e "$REDMAP_SERVER_PID" ]] && kill -0 $( cat $REDMAP_SERVER_PID ) > /dev/null 2>&1; then
+        echo "INFO: The server is running"
+        return 1
+    else
+        echo "INFO: The server is not currently running"
+        return 0
+    fi
+}
+
+function redmap-server-start() {
+    if [[ redmap-server-status -eq 1 ]]; then
+        echo "ERROR: server is already running"
+        return 1
+    else
+        echo "INFO: starting the redmap server"
+    fi
+
+    export PYTHONPATH=$PYTHONPATH:$HOME/deploy/imas/redmap/src:$HOME/deploy/imas/redmap/src/redmap/apps
+    source $HOME/deploy/imas/redmap/venv/bin/activate
+    cd $HOME/deploy/imas/redmap/src/redmap
+    python manage.py run_gunicorn $REDMAP_SERVER_SETTINGS
+}
+
+function redmap-server-stop() {
+    if [[ redmap-server-status -eq 0 ]]; then
+        echo "INFO: stopping server"
+        kill -9 `cat $REDMAP_SERVER_PID`
+        return 0
+    else
+        echo "ERROR: server is not currently running!"
+        return 1
+    fi
+}
+
+case "$1" in
+    start)
+        redmap-server-start
+        ;;
+    stop)
+        redmap-server-stop
+        ;;
+    restart)
+        redmap-server-stop
+        redmap-server-start
+        ;;
+    status)
+        redmap-server-status
+        ;;
+    *) echo $USAGE
+        exit 2
+        ;;
+esac
+exit 0

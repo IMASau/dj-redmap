@@ -1,0 +1,4 @@
+id,name,slug,enabled,survey
+1,"Front Page",front_page,1,"<script src=""https://www.surveymonkey.com/jsPop.aspx?sm=mwSD5fj3u2SyD3jONJrNww_3d_3d""> </script>"
+2,"End of logging",add_step_4,1,"<script src=""https://www.surveymonkey.com/jsPop.aspx?sm=AQxtIvLoGEMyaFlCWv927Q_3d_3d""> </script>"
+3,"Resources section",resources,1,"<script src=""https://www.surveymonkey.com/jsPop.aspx?sm=dvqI_2b1Jmv7RAi5OC5lWdzg_3d_3d""> </script>"

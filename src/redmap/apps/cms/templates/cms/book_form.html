@@ -1,0 +1,48 @@
+{% extends "cms/page_list.html" %}
+
+{% load i18n bootstrap_tags backend_extras %}
+
+{% block extra_head %}
+	<!-- Chosen -->
+	<link href="{{ STATIC_URL }}css/chosen/chosen.css" rel="stylesheet">
+{% endblock %}
+
+{% block extra_script %}
+	<!-- Chosen -->
+	<script src="{{ STATIC_URL }}js/chosen.jquery.min.js"></script>
+	<script>
+	$(document).ready(function() {
+		$("select").chosen();
+	});
+	
+	$('#{{ form.title.auto_id }}').bind({
+		keyup: function() {
+			$('#{{ form.slug.auto_id }}').val($(this).val().slugify());
+		}
+	});
+	</script>
+{% endblock %}
+
+{% block content %}
+
+<form action="." method="POST" class="form-horizontal">{% csrf_token %}
+	<fieldset>
+		<legend>Create a book</legend>
+		
+		{% include "frontend/fields/textfield.html" with field=form.title %}
+		{% include "frontend/fields/textfield.html" with field=form.slug help_text="The unique URL for this news entry" %}
+		{% include "frontend/fields/textfield.html" with field=form.tag_list %}
+		
+		<div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-large"><i class="icon-ok-circle icon-white"></i> Save</button>
+            <a href="{% url cms_index %}" class="btn btn-large">Cancel</a>
+            {% if book %}
+				<span class="pull-right">
+					<a href="{% url cms_page_delete book.pk book.pk %}" class="btn btn-danger">Delete</a>
+				</span>
+            {% endif %}
+        </div>
+	</fieldset>
+</form>
+
+{% endblock %}

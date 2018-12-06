@@ -1,0 +1,58 @@
+#!/bin/bash
+
+USAGE="redisctl {start,stop,restart,status}"
+
+REDIS_SERVER_PID="$HOME/deploy/tmp/redis.pid"
+REDIS_CONFIG="$HOME/deploy/tmp/redis.conf"
+
+function redis-server-status() {
+    if [[ -e "$REDIS_SERVER_PID" ]] && kill -0 $( cat $REDIS_SERVER_PID ) > /dev/null 2>&1; then
+        echo "INFO: The server is running"
+        redis-cli info
+        return 1
+    else
+        echo "INFO: The server is not currently running"
+        return 0
+    fi
+}
+
+function redis-server-start() {
+    if [[ redis-server-status -eq 1 ]]; then
+        echo "ERROR: server is already running"
+        return 1
+    else
+        echo "INFO: starting the redis server"
+        redis-server $REDIS_CONFIG
+    fi
+}
+
+function redis-server-stop() {
+    if [[ redis-server-status -eq 0 ]]; then
+        echo "INFO: stopping server"
+        redis-cli shutdown save
+        return 0
+    else
+        echo "ERROR: server is not currently running!"
+        return 1
+    fi
+}
+
+case "$1" in
+    start)
+        redis-server-start
+        ;;
+    stop)
+        redis-server-stop
+        ;;
+    restart)
+        redis-server-stop
+        redis-server-start
+        ;;
+    status)
+        redis-server-status
+        ;;
+    *) echo $USAGE
+        exit 2
+        ;;
+esac
+exit 0

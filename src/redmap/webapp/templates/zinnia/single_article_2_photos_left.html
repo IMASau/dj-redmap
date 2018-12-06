@@ -1,0 +1,52 @@
+{% extends 'zinnia/entry_detail.html' %}
+
+{% load thumbnail %}
+
+{% block content_body %}
+{% if object.image %}
+	<div class="box col col-220">
+		{% if object.gallery.count or object.image %}
+			<ul class="overflow clear-3 thumbs-col-3 padt" style="margin: 0;">
+				{% if object.image %}
+					<li class="thumbnail">
+						<p>
+							<a class="lightbox-image" title="{% if object.except %}{{ object.excerpt }}{% endif %}" href="{% thumbnail object.image '640x480' as im %}{{ im.url }}{% endthumbnail %}">
+								
+								{% thumbnail object.image '200x200' as im %}
+									<img src="{{ im.url }}">
+								{% endthumbnail %}
+								
+							</a>
+						</p>
+						{% if object.image_caption %}<p><cite>{{ object.image_caption }}</cite></p>{% endif %}
+					</li>
+				{% endif %}
+
+				{% for image in object.gallery.all %}
+					<li class="thumbnail">
+						<p>
+							<a class="lightbox-image" title="{{ image.caption }}" href="{% thumbnail image.image '640x480' as im %}{{ im.url }}{% endthumbnail %}">
+								
+								{% thumbnail image.image '200x200' as im %}
+									<img src="{{ im.url }}">
+								{% endthumbnail %}
+								
+							</a>
+						</p>
+						{% if image.caption %}<p><cite>{{ image.caption }}</cite></p>{% endif %}
+					</li>
+				{% endfor %}
+			</ul>
+		{% endif %}
+		
+		
+		<span class="paperclip-left"></span>
+	</div>
+	<div class="col col-400 margl2">
+{% else %}
+	<div class="col col-620 margl2">
+{% endif %}
+	{{ object.content|safe }}
+
+
+{% endblock %}

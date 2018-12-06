@@ -1,0 +1,7 @@
+
+{{ object.book.title }}
+{{ object.title }}
+{{ object.slug }}
+{{ object.content }}
+{{ object.tag_list }}
+

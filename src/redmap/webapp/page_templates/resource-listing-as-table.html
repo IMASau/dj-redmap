@@ -1,0 +1,38 @@
+{% extends "frontend/page.html" %}
+
+{% load article_tags %}
+
+{% block content %}
+
+
+	<div class="entry-content">
+		{{ page.content|safe }}	
+	</div>
+
+	{% articles_with_tags region|default:redmap_tag page as resources %}
+
+	<table class="table table-bordered margt2">
+		<thead>
+			<tr>
+				<th>Resource</th>
+			</tr>
+		</thead>
+		<tbody>		
+			{% for resource in resources %}
+				<tr class="row-hover row-clickable" data-href="{{ resource.get_absolute_url }}">
+					<th>						
+						<a href="{% url article_view resource.slug %}">{{ resource.title }}</a>
+						<div class="nobold nopmarg lighter">{{ resource.excerpt|safe }}</div>
+					</th>
+				</tr>
+			{% empty %}
+				<tr>
+					<td class="center">
+						No resources have been added
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+{% endblock %}

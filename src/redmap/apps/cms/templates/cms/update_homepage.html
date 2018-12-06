@@ -1,0 +1,72 @@
+{% extends "backend/panel_base.html" %}
+
+{% load i18n bootstrap_tags backend_extras %}
+
+{% block panel_nav %}
+    {% navtabs "Content" request.user %}
+{% endblock %}
+
+{% block panel_sub_nav %}
+    {% panel_content "Homepage" %}
+{% endblock %}
+
+{% block extra_head %}
+	<!-- Chosen -->
+	<link href="{{ STATIC_URL }}css/chosen/chosen.css" rel="stylesheet">
+{% endblock %}
+
+{% block extra_script %}
+	<!-- Chosen -->
+	<script src="{{ STATIC_URL }}js/chosen.jquery.min.js"></script>
+	<script>
+	$(document).ready(function() {
+		$("select").chosen();
+	});
+	</script>
+{% endblock %}
+
+{% block content %}
+<form class="form-horizontal" action="{% url cms_homepage %}" method="POST">{% csrf_token %}
+    <fieldset>
+        <legend>Update homepage</legend>
+        {{ form|as_bootstrap }}
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-large"><i class="icon-ok-circle icon-white"></i> Save</button>
+        </div>
+    </fieldset>
+</form>
+
+{% if version_list %}
+	<div id="accordion" class="accordion">
+		<div class="accordion-group">
+			<div class="accordion-heading">
+				<a href="#collapseOne" data-parent="#accordion" data-toggle="collapse" class="accordion-toggle">
+					View page revisions
+				</a>
+			</div>
+			<div class="accordion-body collapse" id="collapseOne" style="height: 0px;">
+				<table class="table table-bordered table-striped accordion-inner">
+					<thead>
+						<tr>
+							<th>Date</th>
+							<th>Author</th>
+							<th>Options</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for version in version_list %}
+							<tr>
+								<td>{% include "backend/_date.html" with date=version.revision.date_created %}</td>
+								<td>{{ version.revision.user.profile }}</td>
+								<td>
+									<a href="{% url cms_page_revert_revision 0 version.id %}" class="btn btn-primary">Revert</a>
+								</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+{% endif %}
+{% endblock %}

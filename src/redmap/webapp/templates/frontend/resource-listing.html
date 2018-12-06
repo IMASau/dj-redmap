@@ -1,0 +1,56 @@
+{% extends "site_base.html" %}
+{% load i18n thumbnail %}
+
+{% block section_title %}
+	<h1>National Resources</h1>
+{% endblock %}
+
+{% block body_class %}resources{% endblock %}
+
+{% block body %}
+
+	<div>
+	
+		<div class="col col-640 margr2">
+		
+			<header id="title">
+				<h1>{{ page.title }}</h1>
+			</header>
+
+			{% if page.children.all.count %}
+			<div class="row padt2" id="resources-index">
+				{% for sub_category in page.children.all %}
+					<div class="span4 box">
+						<header class="box-heading  box-heading-light box-heading  box-heading-light-light">
+							<h4>{{ sub_category.title }}</h4>
+						</header>
+						<a href="{{ sub_category.get_public_url }}">
+							{% if sub_category.thumbnail %}
+								{% thumbnail sub_category.thumbnail "270x180" crop="center" as im %}
+									<img src="{{ MEDIA_URL }}{{ im }}">
+								{% endthumbnail %}
+							{% else %}
+								<img src="{{ STATIC_URL }}reskin/images/placeholder.png" style="height:180px;">
+							{% endif %}
+						<p class="arrow"><a href="{{ sub_category.get_public_url }}">View articles</a></p>
+						<span class="paperclip-left"></span>
+					</div>
+				{% endfor %}
+			</div>
+			{% else %}
+				<p>No sub-categories were found</p>
+			{% endif %}
+		</div>
+		
+		<div class="col col-260 margl2 padt2 sidebar-up" id="sidebar">
+			<div class="box pada2">
+			
+				{% include 'nav/page_list.html' %}
+			
+				<span class="paperclip-right-angle"></span>
+			</div>
+		</div>
+		
+	</div>
+
+{% endblock %}

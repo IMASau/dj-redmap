@@ -1,0 +1,108 @@
+{% extends "backend/panel_base.html" %}
+
+{% load i18n backend_extras mptt_tags frontend_tags %}
+
+{% block panel_nav %}
+    {% navtabs "Content" request.user %}
+{% endblock %}
+
+{% block panel_sub_nav %}
+    {% panel_content "Pages" %}
+{% endblock %}
+
+{% block extra_head %}{{ block.super }}
+	<!-- jQuery UI -->
+	<link href="{{STATIC_URL}}css/jquery-ui/jquery-ui-1.8.18.custom.css" rel="stylesheet">
+{% endblock %}
+
+{% block extra_script %}{{ block.super }}
+	<!-- jQuery UI -->
+	<script src="{{STATIC_URL}}reskin/js/libs/jquery-ui-1.8.23.custom.min.js"></script>
+
+	<script src="{{STATIC_URL}}js/jquery.ui.nestedSortable.js"></script>
+	<script>
+	$(function() {
+
+		var sortable = $("ol.sortable"),
+			positions = $("#id_positions");
+
+		sortable.nestedSortable({
+			disableNesting: 'no-nest',
+			forcePlaceholderSize: true,
+			handle: 'div',
+			helper: 'clone',
+			items: 'li',
+			maxLevels: 3,
+			opacity: .6,
+			placeholder: 'sortable-placeholder',
+			revert: 250,
+			tabSize: 25,
+			tolerance: 'pointer',
+			toleranceElement: '> div'
+		});
+
+		sortable.bind("sortupdate", function(event, ui) {
+			positions.val(sortable.nestedSortable("serialize"));
+		});
+	});
+	</script>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div id="alert-box" class="span12"></div>
+</div>
+
+	{% if saved %}
+		<div class="alert alert-success">
+			<a data-dismiss="alert" class="close">×</a>
+			New positions have been saved
+		</div>
+	{% endif %}
+	
+	<form action="{% url cms_index %}" method="POST">
+		{% csrf_token %}
+		
+		<div class="actions">
+			<p>
+				<a href="{% url cms_page_add book.pk %}" class="btn btn-large btn-primary"><i class="icon-plus-sign icon-white"></i> Add page</a>			
+				<button type="submit" class="btn btn-primary btn-large"><i class="icon-ok-circle icon-white"></i> Save positions</button>
+			</p>
+		</div>
+		
+		<table class="table table-bordered">
+			<thead>
+				<tr>
+					<th>Pages</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td{% if not pages %} class="center"{% endif %}>
+						{% if pages %}
+							<input type="hidden" id="id_positions" name="positions">
+							<ol class="sortable">
+								{% recursetree pages %}
+								<li id="list_{{ node.id }}">
+									<div>
+										<i class="icon-th"></i>
+										{{ node.title }}
+										-
+										<a href="{% url cms_edit node.id %}">Edit</a>
+									</div>
+									{% if not node.is_leaf_node %}
+									<ol>{{ children }}</ol>
+									{% endif %}
+								</li>
+								{% endrecursetree %}
+							</ol>							
+						{% else %}
+							<strong>No pages have been created</strong>
+						{% endif %}
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	
+	</form>
+{% endblock %}

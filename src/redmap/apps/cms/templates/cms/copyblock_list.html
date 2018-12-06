@@ -1,0 +1,38 @@
+{% extends "backend/panel_base.html" %}
+
+{% load i18n backend_extras mptt_tags frontend_tags %}
+
+{% block panel_nav %}
+{% navtabs "Content" request.user %}
+{% endblock %}
+
+{% block panel_sub_nav %}
+{% panel_content "CopyBlocks" %}
+{% endblock %}
+
+{% block content %}
+	<div class="actions">
+		<p>
+			<a href="{% url cms_copyblock_add %}" class="btn btn-large btn-primary"><i class="icon-plus-sign icon-white"></i> Create a copy block</a>
+		</p>
+	</div>
+
+	<table class="table table-striped table-hover table-bordered">
+		<thead>
+			<tr>
+				<th>Slug</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for copyblock in object_list %}
+				<tr>
+					<th><a href="{% url cms_copyblock_edit copyblock.pk %}">{{ copyblock.slug }}</a></th>
+					<td class="right">
+						<a class="btn" href="{% url cms_copyblock_edit copyblock.pk %}">Edit copy block</a>
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+{% endblock %}

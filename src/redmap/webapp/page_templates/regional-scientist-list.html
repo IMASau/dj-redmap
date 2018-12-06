@@ -1,0 +1,22 @@
+{% extends "frontend/page.html" %}
+
+{% load frontend_tags thumbnail %}
+
+{% block content %}
+
+
+	<div class="entry-content">
+		{{ page.content|safe }}	
+	</div>
+
+	<ul class="padt" id="scientists">
+		{% get_scientists region as scientists %}
+		{% for scientist in scientists %}
+			<li class="box pada margb2">
+				{% include "snippet/profile-feature.html" with profile=scientist %}
+				<span class="paperclip-left"></span>
+			</li>
+		{% endfor %}
+	</ul>
+
+{% endblock %}

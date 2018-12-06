@@ -1,0 +1,11 @@
+<nav id="breadcrumbs">
+	<a href="/">Home</a>
+	<span class="sep">&#155;</span>
+	{% for ancestor in ancestors %}
+		{% if ancestor.level > 0 %}
+			<a href="{{ ancestor.get_public_url }}">{{ ancestor.title }}</a>
+			<span class="sep">&#155;</span>
+		{% endif %}
+	{% endfor %}
+	<a href="#">{{ page.title }}</a>
+</nav>

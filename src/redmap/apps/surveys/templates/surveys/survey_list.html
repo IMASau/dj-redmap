@@ -1,0 +1,31 @@
+{% extends "backend/panel_base.html" %}
+
+{% load i18n backend_extras %}
+
+{% block panel_nav %}
+    {% navtabs "Administration" request.user %}
+{% endblock %}
+
+{% block panel_sub_nav %}
+    {% panel_administration "Surveys" request.user %}
+{% endblock %}
+
+{% block extra_head %}
+	{{ block.super }}
+	<!-- Chosen -->
+	<link href="{{ STATIC_URL }}css/chosen/chosen.css" rel="stylesheet">
+{% endblock %}
+
+
+{% block content %}
+<table class="table">
+    {% for survey in survey_list %}
+    <tr>
+        <th>{{ survey.name }}</th>
+        <td>
+            <a class="btn" href="{% url survey_update pk=survey.pk %}">Edit</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

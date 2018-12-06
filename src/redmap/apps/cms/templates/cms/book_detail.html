@@ -1,0 +1,114 @@
+{% extends "backend/panel_base.html" %}
+
+{% load i18n backend_extras mptt_tags frontend_tags %}
+
+{% block panel_nav %}
+{% navtabs "Content" request.user %}
+{% endblock %}
+
+{% block panel_sub_nav %}
+{% panel_content "Pages" %}
+{% endblock %}
+
+{% block extra_head %}{{ block.super }}
+<!-- jQuery UI -->
+<link href="{{STATIC_URL}}css/jquery-ui/jquery-ui-1.8.18.custom.css" rel="stylesheet">
+
+{{form.media}}
+{% endblock %}
+
+{% block extra_script %}{{ block.super }}
+<!-- jQuery UI -->
+<script src="{{STATIC_URL}}reskin/js/libs/jquery-ui-1.8.23.custom.min.js"></script>
+
+<script src="{{STATIC_URL}}js/jquery.ui.nestedSortable.js"></script>
+<script>
+$(function() {
+
+	var sortable = $("ol.sortable"),
+	positions = $("#id_positions");
+
+	sortable.nestedSortable({
+		disableNesting: 'no-nest',
+		forcePlaceholderSize: true,
+		handle: 'div',
+		helper: 'clone',
+		items: 'li',
+		maxLevels: 3,
+		opacity: .6,
+		placeholder: 'sortable-placeholder',
+		revert: 250,
+		tabSize: 25,
+		tolerance: 'pointer',
+		toleranceElement: '> div'
+	});
+
+	sortable.bind("sortupdate", function(event, ui) {
+		positions.val(sortable.nestedSortable("serialize"));
+	});
+});
+</script>
+{% endblock %}
+
+{% block content %}
+
+<div class="actions">
+	<p>
+		<a href="{% url cms_book_edit book.pk %}" class="btn btn-large btn-primary"><i class="icon-plus-sign icon-white"></i> Edit book</a>
+		<a href="{% url cms_page_add book.pk %}" class="btn btn-large btn-primary"><i class="icon-plus-sign icon-white"></i> Add a page to this book</a>
+	</p>
+</div>
+
+<h3>Book: <em>{{ book.title }}</em></h3>
+
+{% with book.get_descendants as pages %}
+	<form action="{% url cms_book_reorder book.pk %}" method="POST">{% csrf_token %}
+	<table class="table table-bordered">
+		<thead>
+			<tr>
+				<th>Pages</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				{% if pages %}
+					<td>
+
+							<input type="hidden" id="id_positions" name="positions">
+							<ol class="sortable">
+								{% recursetree pages %}
+								<li id="list_{{ node.id }}">
+									<div>
+										<i class="icon-th"></i>
+										{% if node.status == DRAFT %}
+										<em>{{ node.title }} (Draft)</em>
+										{% elif node.status == HIDDEN %}
+										{{ node.title }} <em>(Hidden)</em>
+										{% else %}
+										{{ node.title }}
+										{% endif %} -
+										<a href="{% url cms_page_edit book.pk node.id %}">Edit</a>
+										-
+										<a href="{{ node.get_public_url }}">View</a>
+									</div>
+									{% if not node.is_leaf_node %}
+										<ol>{{ children }}</ol>
+									{% endif %}
+								</li>
+								{% endrecursetree %}
+							</ol>
+
+					</td>
+				{% else %}
+					<td class="center">
+						<strong>No pages have been created</strong>
+					</td>
+				{% endif %}
+			</tr>
+		</tbody>
+	</table>
+	<button type="submit" class="btn btn-primary btn-large"><i class="icon-ok-circle icon-white"></i> Save positions</button>
+	</form>
+{% endwith %}
+
+{% endblock %}

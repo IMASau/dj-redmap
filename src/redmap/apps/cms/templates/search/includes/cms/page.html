@@ -1,0 +1,14 @@
+{# View for profile #}
+{% with result.object as page %}
+<h3 class="red">
+	<a href="{{ page.get_public_url }}">
+		<strong>
+		    {{ page.title }}
+		</strong>
+	</a>
+</h3>
+{% if page.excerpt %}
+	{{ page.excerpt|truncatechars:250 }}
+{% else %}
+    {{ page.content|safe|striptags|truncatechars:250 }}
+{% endif %}{% endwith %}

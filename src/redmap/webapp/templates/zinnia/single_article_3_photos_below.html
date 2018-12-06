@@ -1,0 +1,31 @@
+{% extends 'zinnia/entry_detail.html' %}
+
+{% load thumbnail %}
+
+{% block content_gallery_below %}
+	{% if object.gallery.count %}
+	<div class="clear"></div>
+	<div class="box overflow thumbnails">
+		
+			{% for image in object.gallery.all %}
+
+			<div class="col col-210">
+				<div class="thumbnail">
+				
+					{% thumbnail image.image '200x200' as im %}
+						<p><a class="lightbox-image" title="{{ image.caption }}" href="{{ image.image.url }}"><img src="{{ im.url }}"></a></p>
+					{% endthumbnail %}
+
+					<p><cite>{{ image.caption }}</cite></p>
+				</div>
+			</div>
+
+			{% if forloop.counter|divisibleby:3 %}
+			<div class="clear"></div>
+			{% endif %}
+
+			{% endfor %}
+
+	</div><!-- /.box -->
+	{% endif %}
+{% endblock %}

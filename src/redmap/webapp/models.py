@@ -1,0 +1,1 @@
+# django requires the models.py file to exist within an app installed in django settings

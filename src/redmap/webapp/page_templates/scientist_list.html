@@ -1,0 +1,33 @@
+{% extends "frontend/page.html" %}
+{% load thumbnail %}
+
+{% block content %}
+
+	<div class="entry-content">
+		{{ page.content|safe }}
+	</div>
+
+	<ul class="padt" id="scientists">
+		{% for scientist in region.scientists %}
+			<li class="box pada margb2">
+				<div class="overflow">
+					{% thumbnail scientist.image "194x194" crop="center" format="JPEG" as im %}
+						<img class="fleft polaroid-small"
+						     title="{{ scientist.user.profile }}"
+						       alt="{{ scientist.user.profile }}"
+						       src="{{ im.url }}">
+					{% empty %}
+						No image supplied
+					{% endthumbnail %}
+					<div class="margl-220">
+						<h3 class="margt">
+							{{ scientist.user.profile }}
+						</h3>
+						{{ scientist.about_me|linebreaks }}
+					</div>
+				</div>
+				<span class="paperclip-left"></span>
+			</li>
+		{% endfor %}
+	</ul>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% comment %}
+
+Render a preview button for sidebar with convenience save action based on the state of the model.
+
+Expects `form` environment variable.
+
+{% endcomment %}
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Options</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                <input name="save_and_continue" type="submit" value="Save and continue editing" class="btn">
+                
+                {% if form.instance.pk and form.instance.is_draft %}
+                <input name="save_and_preview" type="submit" value="Preview draft" class="btn">
+                {% elif form.instance.pk and not form.instance.is_draft %}
+                <input name="save_and_view" type="submit" value="Save and view" class="btn">
+                {% endif %}
+            </td>
+        </tr>
+    </tbody>
+</table>

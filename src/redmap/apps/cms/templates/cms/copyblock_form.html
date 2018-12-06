@@ -1,0 +1,25 @@
+{% extends "cms/copyblock_list.html" %}
+
+{% load i18n bootstrap_tags backend_extras %}
+
+{% block content %}
+
+<form action="." method="POST" class="form-horizontal">{% csrf_token %}
+	<fieldset>
+		<legend>Create a copy block</legend>
+
+		{{ form|as_bootstrap }}
+
+		<div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-large"><i class="icon-ok-circle icon-white"></i> Save</button>
+            <a href="{% url cms_copyblock_index %}" class="btn btn-large">Cancel</a>
+            {% if copyblock.pk %}
+				<span class="pull-right">
+					<a href="{% url cms_copyblock_delete copyblock.pk %}" class="btn btn-danger">Delete</a>
+				</span>
+            {% endif %}
+        </div>
+	</fieldset>
+</form>
+
+{% endblock %}

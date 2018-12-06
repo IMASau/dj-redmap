@@ -1,0 +1,91 @@
+{% extends "backend/panel_base.html" %}
+
+{% load i18n thumbnail backend_extras %}
+
+{% block panel_nav %}
+    {% navtabs "Content" request.user %}
+{% endblock %}
+
+{% block panel_sub_nav %}
+    {% panel_content "News" %}
+{% endblock %}
+
+{% block content %}
+
+	<div class="actions">
+		<div class="float-right field controls">
+			<form method="get" action=".">
+				<input type="text" maxlength="255" name="filter" style="margin-bottom: 0;"{% if "filter" in request.GET.keys %} value="{{request.GET.filter}}"{% endif %}>
+				<button type="submit" class="btn btn-large"><i class="icon-ok-circle"></i> Apply filter</button>
+				{% if "filter" in request.GET.keys %}<a href="?page={{ page_obj.number }}" class="btn btn-large">Clear filter</a>{% endif %}
+			</form>
+		</div>
+		
+		<p><a href="{% url news_entry_add %}" class="btn btn-large btn-primary"><i class="icon-plus-sign icon-white"></i> Add new entry</a></p>
+	</div>
+	
+	<table class="table table-bordered table-striped">
+		<thead>
+			<tr>
+				<th>Title</th>
+				<th>Author</th>
+				<th>Category</th>
+				<th>Tags</th>
+				<th>Published</th>
+				<th>Created</th>
+				<th>Options</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for entry in object_list %}
+				<tr>
+					<th>
+						<a href="{% url news_entry_edit entry.id %}" title="Edit">{{ entry.title }}</a>
+					</th>
+					<td>
+						{{ entry.author }}
+					</td>
+					<td>
+						{% for category in entry.categories.all %}
+							{{ category.slug }}
+						{% endfor %}
+					</td>
+					<td>
+						{{ entry.tags }}
+					</td>
+					<td>
+						{% if entry.status == 0 %}
+							{{ STATUS_CHOICES.0 }}
+						{% else %}
+							{% if entry.status == 1 %}
+								{{ STATUS_CHOICES.1 }}
+							{% else %}
+								{% if entry.status == 2 %}
+									{{ STATUS_CHOICES.2 }}
+								{% endif %}
+							{% endif %}
+						{% endif %}
+					</td>
+					<td>
+						{% include "backend/_date.html" with date=entry.creation_date %}
+					</td>
+					<td class="right">
+						<a href="{% url news_entry_edit entry.id %}" class="btn">Edit</a>
+					</td>
+				</tr>
+			{% empty %}
+				<tr>
+					<td colspan="7" class="center">
+						<strong>No entries found</strong>
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	
+	{% if is_paginated %}
+	  {% include "backend/_pagination.html" %}
+	{% endif %}
+	
+{% endblock %}
+

@@ -1,0 +1,120 @@
+{% extends "cms/page_list.html" %}
+
+{% load i18n bootstrap_tags backend_extras %}
+
+{% block extra_head %}
+	<!-- Chosen -->
+	<link href="{{ STATIC_URL }}css/chosen/chosen.css" rel="stylesheet">
+{% endblock %}
+
+{% block extra_script %}
+	<!-- Chosen -->
+	<script src="{{ STATIC_URL }}js/chosen.jquery.min.js"></script>
+	<script>
+	$(document).ready(function() {
+		$("select").chosen();
+	});
+	
+	$('#{{ form.title.auto_id }}').bind({
+		keyup: function() {
+			$('#{{ form.slug.auto_id }}').val($(this).val().slugify());
+		}
+	});
+	</script>
+{% endblock %}
+
+{% block content %}
+<form action="{% if page %}{% url cms_page_edit book.pk page.pk %}{% else %}{% url cms_page_add book.pk %}{% endif %}" method="POST" enctype="multipart/form-data">{% csrf_token %}
+    <fieldset>
+        <legend>{% if pk %}Edit{% else %}Add{% endif %} page</legend>
+		
+		<div class="row" style="overflow: inherit;">
+			<div class="span8">
+				<div class="row">
+					<div class="span4">
+						{% include "frontend/fields/textfield.html" with field=form.title %}
+					</div>
+					<div class="span4">
+						{% include "frontend/fields/textfield.html" with field=form.slug help_text="The unique URL for this news entry" %}
+					</div>
+				</div>
+					
+				{% include "frontend/fields/textfield.html" with field=form.content %}
+				{% include "frontend/fields/textfield.html" with field=form.caption %}
+			</div>
+			<div class="span4">
+				{% include "cms/preview_button.html" with form=form %}
+				<table class="table table-bordered">
+					<thead>
+						<tr>
+							<th>Page attributes</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>								
+								{% include "frontend/fields/textfield.html" with field=form.template %}
+								{% include "frontend/fields/textfield.html" with field=form.parent %}
+								{% include "frontend/fields/textfield.html" with field=form.tag_list %}
+								{% include "frontend/fields/textfield.html" with field=form.status %}
+								
+								<div class="control-group">
+								<label class="control-label" for="id_thumbnail">Thumbnail </label>
+								<div class="field controls">
+									{{ form.thumbnail }}
+									{% if form.thumbnail.errors %}
+										{{ form.thumbnail.errors }}
+									{% endif %}
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		
+        <div class="form-actions">		
+            <button type="submit" class="btn btn-primary btn-large"><i class="icon-ok-circle icon-white"></i> Save</button>
+            <a href="{% url cms_index %}" class="btn btn-large">Cancel</a>
+            {% if pk %}
+				<span class="pull-right">
+					<a href="{% url cms_page_delete book.pk page.pk %}" class="btn btn-danger">Delete</a>
+				</span>
+            {% endif %}
+        </div>
+    </fieldset>
+</form>
+{% if version_list %}
+<div id="accordion" class="accordion">
+    <div class="accordion-group">
+        <div class="accordion-heading">
+            <a href="#collapseOne" data-parent="#accordion" data-toggle="collapse" class="accordion-toggle">
+                View page revisions
+            </a>
+        </div>
+        <div class="accordion-body collapse" id="collapseOne" style="height: 0px;">
+            <table class="table table-bordered table-striped accordion-inner">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Author</th>
+                        <th>Options</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for version in version_list %}
+                    <tr>
+                        <td>{{ version.revision.date_created }}</td>
+                        <td>{{ version.revision.user.profile }}</td>
+                        <td>
+                            <a href="{% url cms_page_revert_revision book.pk version.id %}" class="btn btn-primary">Revert</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

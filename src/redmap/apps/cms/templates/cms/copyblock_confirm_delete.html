@@ -1,0 +1,15 @@
+{% extends "cms/page_list.html" %}
+
+{% load i18n bootstrap_tags backend_extras %}
+
+{% block content %}
+<form action="{% url cms_copyblock_delete copyblock.pk %}" method="POST">{% csrf_token %}
+    <fieldset>
+        <legend>Are you sure you want to delete <strong>"{{ copyblock.slug }}"</strong></legend>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-danger">Delete</button>
+            <a href="{% url cms_copyblock_index %}" class="btn">Cancel</a>
+        </div>
+    </fieldset>
+</form>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "cms/page_list.html" %}
+
+{% load i18n bootstrap_tags backend_extras %}
+
+{% block content %}
+<form action="{% url cms_revert version.id %}" method="POST">{% csrf_token %}
+    <fieldset>
+        <legend>Are you sure you want to revert to the revision made by <strong>{{ version.revision.user.profile }}</strong> on <strong>{{ version.revision.date_created }}</strong>?</legend>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Revert</button>
+            <a href="{% url cms_edit version.object_id %}" class="btn">Cancel</a>
+        </div>
+    </fieldset>
+</form>
+{% endblock %}

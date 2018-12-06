@@ -1,0 +1,30 @@
+{% extends "frontend/page.html" %}
+
+{% load tagging_tags article_tags %}
+
+{% block content %}
+
+
+	<div class="entry-content">
+		{{ page.content|safe }}	
+	</div>
+
+	{% tags_for_object page as tags %}
+
+	<ul id="credits">
+		{% for tag in tags %}
+			<li>
+				<h4>{{ tag.name|title }}</h4>
+				<ul>
+					{% people_with_tags tag as people %}
+					{% for author in people %}
+						<li>
+							{{ author.user.profile.get_link }}
+						</li>
+					{% endfor %}
+				</ul>
+			</li>
+		{% endfor %}
+	</ul>
+
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "backend/panel_base.html" %}
+
+{% load i18n backend_extras mptt_tags frontend_tags %}
+
+{% block panel_nav %}
+{% navtabs "Content" request.user %}
+{% endblock %}
+
+{% block panel_sub_nav %}
+{% panel_content "Pages" %}
+{% endblock %}
+
+{% block content %}
+	<div class="actions">
+		<p>
+			<a href="{% url cms_book_add %}" class="btn btn-large btn-primary"><i class="icon-plus-sign icon-white"></i> Create a book</a>
+		</p>
+	</div>
+
+	<h3>Click on a book below to view its pages</h3>
+	<table class="table table-striped table-hover table-bordered">
+		<thead>
+			<tr>
+				<th>Books</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for book in object_list %}
+				<tr>
+					<th><a href="{% url cms_book_detail book.pk %}">{{ book.title }}</a></th>
+					<td class="right">
+						<a class="btn" href="{% url cms_book_detail book.pk %}">Show pages</a>
+						<a class="btn" href="{% url cms_book_edit book.pk %}">Edit book</a>
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+{% endblock %}

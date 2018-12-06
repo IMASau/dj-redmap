@@ -1,0 +1,21 @@
+{% block panel-sightings-tabs %}
+<ul class="nav nav-pills">
+    <li{% if active == "Require verification" %} class="active"{% endif %}>
+        <a href="{% url sightings_unvalidated %}">Require verification</a>
+    </li>
+    <li{% if active == "Past assignments" %} class="active"{% endif %}>
+        <a href="{% url sightings_past %}">All assignments</a>
+    </li>
+    {% if perms.redmapdb.can_manage_sightings %}
+    <li{% if active == "All sightings" %} class="active"{% endif %}>
+        <a href="{% url sightings_list %}">All sightings</a>
+    </li>
+    {% endif %}
+    
+    {% if perms.redmapdb.can_export_sightings or perms.redmapdb.can_export_all_sightings or request.user.is_superuser %}
+    <li{% if active == "Export sightings" %} class="active"{% endif %}>
+        <a href="{% url sightings_export %}">Export sightings</a>
+    </li>
+    {% endif %}
+</ul>
+{% endblock %}

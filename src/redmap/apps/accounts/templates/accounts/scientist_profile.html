@@ -1,0 +1,132 @@
+{% extends "site_base.html" %}
+
+{% load i18n thumbnail %}
+
+{% block head_title %}{{ user.get_profile.full_name }}'s {% trans "Scientists" %}{% endblock %}
+
+{% block body_class %}scientists{% endblock %}
+
+{% block section_title %}
+	<h1>{% trans "Scientists" %}</h1>
+{% endblock %}
+
+{% comment %}
+	{% block breadcrumbs %}
+		<nav id="breadcrumbs">
+			<a href="#">About</a>
+			<span class="sep">&#155;</span>
+			<a href="#">Scientists</a>
+			<span class="sep">&#155;</span>
+			<a href="#">Dianne Bray</a>
+		</nav>
+	{% endblock %}
+{% endcomment %}
+
+{% block body %}
+
+	<div class="overflow padt">
+	
+		<div class="col col-230 margr2">
+			<div class="box pada">
+				<div class="polaroid polaroid-white margb2">
+					{% if user.get_profile.image_url %}
+						{% thumbnail user.get_profile.image_url "190x230" crop="center" upscale="true" as im %}
+							<img src="{{ MEDIA_URL }}{{ im }}">
+						{% endthumbnail %}
+					{% else %}
+						<img src="{{ STATIC_URL }}reskin/images/placeholder.png">
+					{% endif %}
+				</div>
+				
+				<p class="red nomargb">{% if user.get_profile.region %}{{ user.get_profile.region.description }}, {% endif %}Australia</p>
+				{% if user.get_profile.organisation %}<p class="nomargb padth">{{ user.get_profile.organisation }}</p>{% endif %}
+				<p class="nomargb padth"><a href="mailto:{{ user.email }}">Email {{ user.first_name }}</a></p>
+				
+				{% if user.get_profile.website %}
+				<p class="nomargb padth">Website: <a href="{{ user.get_profile.website }}">{{ user.get_profile.website }}</a></p>
+				{% endif %}
+				
+				{% if user.get_profile.facebook_url %}
+				<p class="nomargb padth">Facebook: <a href="{{ user.get_profile.facebook_url }}">{{ user.get_profile.facebook_url }}</a></p>
+				{% endif %}
+				
+				{% if user.get_profile.twitter_url %}
+				<p class="nomargb padth">Twitter: <a href="{{ user.get_profile.twitter_url }}">{{ user.get_profile.twitter_url }}</a></p>
+				{% endif %}
+				
+				{% if user.get_profile.linkedin_url %}
+				<p class="nomargb padth">Linkedin: <a href="{{ user.get_profile.linkedin_url }}">{{ user.get_profile.linkedin_url }}</a></p>
+				{% endif %}
+				
+				<span class="paperclip-left"></span>
+			</div>
+		</div>
+		
+		<div class="margl2 col col-420">
+			<h2 class="sans">{{ user.profile }}</h2>
+			{% if user.profile.about_me %}
+				<div class="padt">
+					{{ user.profile.about_me|linebreaks|safe }}
+				</div>
+			{% endif %}
+			
+			
+			{% if published_articles %}
+			<div class="hr padt2 margt2">
+				<h3 class="resources-heading">Redmap Articles</h3>
+				
+				{% for article in published_articles %}
+				<h4>{{ article.title }}</h4>
+				{{ article.content|safe }}
+				{% endfor %}
+				
+			</div>
+			{% endif %}
+			
+			
+			
+			
+			{% if related_links %}
+			<div class="hr padt2 margt2">
+				<h3 class="articles-heading">Related links</h3>
+				<ul class="arrows">
+					{% for result in related_links|slice:":6" %}
+						{% if result.content_type == "zinnia.entry" %}
+							<li><a href="{{ result.object.get_absolute_url }}">{{ result.object.title }}</a></li>
+						{% elif result.content_type == "cms.page" %}
+							<li><a href="{{ result.object.get_public_url }}">{{ result.object.title }}</a></li>
+						{% else %}
+							{% if result.object.get_absolute_url %}<li><a href="{{ result.object.get_absolute_url }}">{{ result.object }}</a></li>{% endif %}
+						{% endif %}
+
+					{% endfor%}
+				</ul>
+			</div>
+			{% endif%}
+		</div>
+		
+		<div class="col col-220 margl2">
+			<h2 id="sightings-verified-heading">Verified Sightings</h2>
+			
+			<div class="thumbnails">
+			
+				{% for sighting in sightings_verified|slice:":6" %}
+					<a href="{% url sighting_detail sighting.id %}">
+						{% thumbnail sighting.photo_url '105x75' crop="center" upscale=True as im %}
+							<img class="polaroid-small" title="Photo of sighting" alt="Photo of sighting" src="{{ im.url }}">
+						{% empty %}
+							<div class="polaroid-small polaroid-placeholder" style="width:105px;height:75px;">
+								<span>No photo</span>
+							</div>
+						{% endthumbnail %}
+					</a>
+				{% empty %}
+					<p class="box pada" style="text-align:center">This scientist has not verified any sightings</p>
+				{% endfor %}
+
+			</div>
+		</div>
+	
+	</div>
+
+{% endblock %}

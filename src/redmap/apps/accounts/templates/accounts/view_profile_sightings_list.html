@@ -1,0 +1,39 @@
+{% load bootstrap_tags i18n thumbnail %}
+		<ul class="listing clear3 padt2">
+			{% for sighting in sightings %}
+				<li class="col overflow col-220 margl2 margb2 sighting">
+					<div class="box pada">
+					    {% url sighting_detail_by_region sighting.region.slug sighting.id as sighting_url %}
+						
+						<a href="{% url sighting_detail sighting.id %}">
+							{% thumbnail sighting.photo_url '194x144' crop="center" upscale=True as im %}
+								<img class="polaroid-small margb" title="Photo of sighting" alt="Photo of sighting" src="{{ im.url }}">
+							{% empty %}
+								<div class="polaroid-small margb polaroid-placeholder" style="width:194px;height:144px;">
+									<span>No photo</span>
+								</div>
+							{% endthumbnail %}
+						</a>
+						{% if sighting.species %}
+							<h3 class="margt nomargb">
+								<a href="{{ sighting_url }}">{{ sighting.species.common_name }}</a>
+							</h3>
+							<p><dfn>{{ sighting.species.species_name }}</dfn></p>
+						{% else %}
+							<h3 class="margt nomargb"><a href="{{ sighting_url }}">{{ sighting.other_species }}</a></h3>
+							<p>&nbsp;</p>
+						{% endif %}
+							<p class="nomargb lighter"><small>
+							{% if sighting.published_date %}
+							{{ sighting.is_valid_sighting|yesno:"Verified,Checked" }}
+							on {{ sighting.published_date|date:"j M Y" }}
+							{% endif %}
+						</small></p>
+					</div>
+				</li>
+			{% empty %}
+				<li>
+					<h4 class="padt2 padb2 center">{% trans "This user has not logged any sightings" %}</h4>
+				</li>
+			{% endfor %}
+		</ul>

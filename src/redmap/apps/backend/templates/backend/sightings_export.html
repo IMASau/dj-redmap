@@ -1,0 +1,104 @@
+{% extends "backend/panel_base.html" %}
+
+{% load i18n thumbnail backend_extras %}
+
+{% block panel_nav %}
+    {% navtabs "Sightings" request.user %}
+{% endblock %}
+
+{% block panel_sub_nav %}
+    {% panel_sightings "Export sightings" %}
+{% endblock %}
+
+{% block extra_head %}
+	{{ block.super }}
+	<!-- Chosen -->
+	<link href="{{ STATIC_URL }}css/chosen/chosen.css" rel="stylesheet">
+{% endblock %}
+
+{% block extra_script %}
+	{{ block.super }}
+	<!-- Chosen -->
+	<script src="{{ STATIC_URL }}js/chosen.jquery.min.js"></script>
+	<script>
+	$(document).ready(function() {
+		var $form = $("#filters");
+		$form.change(function() {
+			$form.submit();
+		});
+		$form.find("select").each(function() {
+			var $select = $(this);
+			var $option = $select.children("option:first-child");
+			var options = {};
+			if (!$option.attr('value')) {
+				// Chosen mixes and matches option sources. Some options are
+				// set via `data-` attributes, some via the options object.
+				// Also, for `'allow_single_deselect'` to work, the first
+				// option element needs to have no text. WTF.
+				$select.attr('data-placeholder', $option.text());
+				options['allow_single_deselect'] = true;
+				$option.text('');
+			}
+			$select.chosen(options);
+		});
+	});
+	</script>
+{% endblock %}
+
+{% block content %}
+	
+	<h3>Export sightings</h3>
+	<div class="alert alert-danger" style="font-size: 16px; line-height: 20px;">
+	{{ copyblock.sighting_admin_download_view_notice|safe|default:"Information accessed or downloaded through this system is FOR OFFICIAL USE ONLY and must be protected and stored securely at all times in accordance with the Privacy Act." }}
+	</div>
+
+	<form action="." method="post" class="form-horizontal">
+		{% csrf_token %}
+
+		<div class="control-group">
+			<label for="{{ form.region.auto_id }}" class="control-label">{{ form.region.label }}</label>
+			<div class="controls">
+				{{ form.region }}
+
+				{% if form.region.errors %}
+					<div class="alert alert-error">
+						<ul class='form-errors'>
+							{% for error in form.region.errors %}
+								<li>{{ error|linebreaks }}</li>
+							{% endfor %}
+						</ul>
+					</div>
+				{% endif %}
+
+			</div>
+		</div>
+
+		<div class="control-group">
+			<label for="{{ form.accept_privacy_warning.auto_id }}" class="control-label">Privacy warning</label>
+			<div class="controls">
+				
+					<label class="checkbox">
+						{{ form.accept_privacy_warning }} <strong style="margin-top: 7px;float: left; font-size: 18px;">{{ form.accept_privacy_warning.label }}</strong>
+					</label>
+				<div class="clear"></div>
+
+				{% if form.accept_privacy_warning.errors %}
+					<div class="alert alert-error">
+						<ul class='form-errors'>
+							{% for error in form.accept_privacy_warning.errors %}
+								<li>{{ error|linebreaks }}</li>
+							{% endfor %}
+						</ul>
+					</div>
+				{% endif %}
+
+			</div>
+
+		</div>
+
+		<div class="form-actions">
+			<button type="submit" class="btn btn-large btn-primary"><i class="icon-white icon-download-alt"></i> Download sightings export</button>
+		</div
+		
+	</form>
+{% endblock %}

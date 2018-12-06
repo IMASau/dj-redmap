@@ -1,0 +1,22 @@
+{% extends 'zinnia/single_article_3_photos_below.html' %}
+
+
+{% block section_title %}
+	<h1>National Resources</h1>
+{% endblock %}
+
+{% block body_class %}resources{% endblock %}
+
+{% block content_title %}<h1>{{ object.title }}</h1>{% endblock %}
+
+{% block content_related %}{% endblock %}
+
+{% block content_aside %}
+	<div class="col col-260 margl2 padt2 sidebar-up" id="sidebar">
+		<div class="box pada2">
+			{% include 'nav/page_list.html' with page=resources %}
+			<span class="paperclip-right-angle"></span>
+		</div>
+	</div>
+{% endblock %}
+

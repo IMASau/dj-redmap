@@ -1,0 +1,16 @@
+{% extends "frontend/page.html" %}
+{% load frontend_extras %}
+
+{% block section_title %}
+<h1>
+	{{ page.parent.title }}
+</h1>
+{% endblock %}
+
+{% block content %}
+
+	<div class="entry-content">
+    	{% include "snippet/html-content.html" with html=page.content %}
+	</div>
+	
+{% endblock %}

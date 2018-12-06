@@ -1,0 +1,127 @@
+{% extends "site_base.html" %}
+{% load i18n thumbnail %}
+
+{% block section_title %}
+	<h1>National Resources</h1>
+{% endblock %}
+
+{% block body_class %}resources{% endblock %}
+
+{% block body %}
+
+	<div>
+	
+		<article class="col col-640 margr2">
+		
+			<header id="title" style="overflow: visible">
+				<h1>{{ page.title }}</h1>
+
+				<div>
+					<div class="col col-right col-100">
+						<div class="social">
+							<div class="social-fb">
+								<div
+									class="fb-like"
+									data-href="{{ full_absolute_uri }}"
+									data-send="false"
+									data-layout="button_count"
+									data-width="100"
+									data-action="like"
+									data-font="arial"
+									data-show-faces="false"
+								></div>
+							</div>
+							<div class="social-twitter">
+								<a href="https://twitter.com/share" class="twitter-share-button">Tweet</a>
+								<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+							</div>
+						</div><!-- /.social -->
+					</div>
+					<div class="margr-120 entry-excerpt padt">
+						{% if page.author %}<p class="red">{{ page.author }}, {{ page.author.location }}</p>{% endif %}
+						{% if page.caption %}{{ page.caption }}{% endif %}
+					</div>
+				</div>
+				
+				<div class="clearfix"></div>
+			</header>
+			
+			{% if page.thumbnail %}
+			<div class="box col col-220">
+				<div class="thumbnail">
+					<p>
+						<a class="lightbox-image" title="A fish trap, Hinchinbrook region, North Queensland (Photo courtesy of Girringun Aboriginal Corporation)." href="http://placehold.it/640x480">
+							<img src="http://placehold.it/200x200">
+						</a>
+					</p>
+					<p><a class="lightbox-image" href="page.thumbnail">View larger image</a></p>
+					<p><cite>A fish trap, Hinchinbrook region, North Queensland (Photo courtesy of Girringun Aboriginal Corporation).</cite></p>
+				</div>
+				<span class="paperclip-left"></span>
+			</div>
+			
+			<div class="col col-400 margl2">
+			{% else %}
+			<div class="col col-620 margl2">
+			{% endif %}
+			
+			
+			
+				{{ page.content|safe }}
+			</div>
+			
+			<div class="clearfix"></div>
+			
+			
+			{% if object.gallery.count %}
+			<div class="box overflow thumbnails">
+				
+				
+					{% for newsimage in object.gallery.all %}
+					<div class="col col-210">
+						<div class="thumbnail">
+						
+							{% thumbnail newsimage.image '200x200' crop="center" as im %}
+
+								<p><a class="lightbox-image" title="{{ newsimage.caption }}" href="{{ newsimage.image.url }}"><img src="{{ im.url }}"></a></p>
+								<p><a class="lightbox-image" href="{{ newsimage.image.url }}">View larger image</a></p>
+
+							{% endthumbnail %}
+
+							<p><cite>{{ newsimage.caption }}</cite></p>
+						</div>
+					</div>
+					{% endfor %}
+				
+
+			</div><!-- /.box -->
+			{% endif %}
+
+			{% comment %}
+			<div class="col col-right col-400 padt2">
+				
+				<div>
+					<h3 class="resources-heading">References</h3>
+					
+					<p>Department of Agriculture, Fisheries and Forestry, 2001 <a href="#">http://daff.gov.au/fisheries/recreational</a></p>
+					<p>Nursey-Bray, M 2000, Usage of Marine Resources by the Guugu Yimmithirr The History of Fishing and Gathering, James Cook University publication, Cairns.</p>
+				</div>
+				
+			</div><!-- /.col -->
+			{% endcomment %}
+		
+		</div>
+		
+		<div class="col col-260 margl2 padt2 sidebar-up" id="sidebar">
+		
+			<div class="box pada2">
+
+				{% include 'nav/page_list.html' %}
+
+				<span class="paperclip-right-angle"></span>
+			</div>
+		</div>
+		
+	</article>
+
+{% endblock %}

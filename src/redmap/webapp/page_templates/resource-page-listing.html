@@ -1,0 +1,39 @@
+{% extends "frontend/page.html" %}
+
+{% load article_tags %}
+
+{% block content %}
+
+	<div class="entry-content">
+		{{ page.content|safe }}	
+	</div>
+
+	<table class="table table-bordered margt2">
+		<thead>
+			<tr>
+				<th>Resource categories</th>
+			</tr>
+		</thead>
+		<tbody>
+			
+			{# Get the book's children #}
+			{% for child in page.book.get_descendants %}
+				{# Exclude this page #}
+				{% ifnotequal child.title page.title %}
+					<tr class="row-hover row-clickable" data-href="{{ child.get_public_url }}">
+						<th>
+							<a href="{{ child.get_public_url }}">{{ child.title }}</a>
+						</th>
+					</tr>
+				{% endifnotequal %}
+			{% empty %}
+				<tr>
+					<td class="center">
+						Sorry, no categories were found
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+{% endblock %}
