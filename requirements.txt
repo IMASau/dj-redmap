@@ -1,7 +1,7 @@
 --extra-index-url=http://pypi.ionata.com/
 
 Django==1.4.20
-lxml
+# lxml
 Pillow==2.4.0
 django-ajax-validation==0.1.3
 django-appconf==0.4.1
@@ -17,9 +17,9 @@ wsgiref==0.1.2
 django-formwizard==1.0
 pyparsing==1.5.7
 django-blog-zinnia==0.10.1
-django-singletons==0.1.6-1
+git+git://github.com/ninemoreminutes/django-singletons.git@9b231666b9027d3bd1159f3db8bce34701193bdd
 django-ckeditor==3.6.3-ionata3
-django-filemanager==0.1.0
+git+git://github.com/byteweaver/django-filemanager.git@ec9e5e1a22eb2a3bf8b3c7572e1f4c4f8dd8a682
 django-reversion==1.7.1
 django-positions==0.4.3
 python-dateutil==2.1
@@ -27,17 +27,18 @@ django-facebook==4.2.2
 django-registration==0.8
 privatebeta==0.4.1
 django-celery-with-redis==3.0
-django-ajax-forms
-redis
+https://files.pythonhosted.org/packages/77/ab/ac4c494418193e708a017fe2d449c50544923ff00dec689103f8f8c7fb99/django-ajax-forms_0.3.1.tar.gz
+redis==2.7.1
 --allow-external pyodbc
 --allow-unverified pyodbc
 pyodbc==3.0.7
-django-pyodbc-mssql==1.0-ionata1
+# Not available
+# django-pyodbc-mssql==1.0-ionata1
 django-chainable-manager==0.3.1
 django-haystack==1.2.7
 xapian-haystack==1.1.5beta
 django-filter==0.5.4
-django-nested-formsets==0.2.0
+git+git://bitbucket.org/ionata/django-nested-formsets.git@470fc9a2922d47f378d09a77e974bbe0a829a401
 django-maintenancemode==0.10
 docutils==0.9.1
 fabric==1.5.1
@@ -48,8 +49,8 @@ South==0.7
 PyYAML==3.10
 Markdown==2.2.1
 djangorestframework==2.3.5
-requests
-django-discover-runner
+requests==2.0.0
+django-discover-runner==1.0
 -e git+https://github.com/ionata/wadofstuff-django-serializers.git@v1.1.0#egg=wadofstuff-django-serializers
-python-magic
-django-extensions
+python-magic==0.4.5
+django-extensions==1.0.1
